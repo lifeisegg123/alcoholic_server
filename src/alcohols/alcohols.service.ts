@@ -1,26 +1,78 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { getCategoryOp } from 'src/utils/getCategoryOp';
+import { Like, Repository } from 'typeorm';
 import { CreateAlcoholDto } from './dto/create-alcohol.dto';
 import { UpdateAlcoholDto } from './dto/update-alcohol.dto';
+import { Alcohol } from './entities/alcohol.entity';
 
 @Injectable()
 export class AlcoholsService {
-  create(createAlcoholDto: CreateAlcoholDto) {
-    return 'This action adds a new alcohol';
+  constructor(
+    @InjectRepository(Alcohol) private alcoholRepository: Repository<Alcohol>,
+  ) {}
+
+  async create(createAlcoholDto: CreateAlcoholDto, file: Express.Multer.File) {
+    await this.alcoholRepository.save({
+      ...createAlcoholDto,
+      thumbnail: file.filename,
+    });
+    return true;
   }
 
-  findAll() {
-    return `This action returns all alcohols`;
+  async findByCategory({ category, limit, offset, sortBy, searchKey }) {
+    const where: any = {};
+    const order: any = {};
+
+    if (!isNaN(category) && category !== 0) {
+      where['category'] = getCategoryOp(category);
+    }
+    if (sortBy) {
+      const [key, value] = sortBy.split(',');
+      order[key] = value;
+    }
+    if (searchKey) {
+      where['name'] = Like(searchKey);
+    }
+
+    const [data, count] = await this.alcoholRepository.findAndCount({
+      where,
+      order,
+      skip: offset,
+      take: limit,
+    });
+    return {
+      count,
+      data,
+      nextPage: data.length === limit ? limit + offset : null,
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} alcohol`;
+  async getNotConfirmed() {
+    return await this.alcoholRepository.find({ where: { isConfirmed: false } });
   }
 
-  update(id: number, updateAlcoholDto: UpdateAlcoholDto) {
-    return `This action updates a #${id} alcohol`;
+  async findOne(id: string) {
+    return await this.alcoholRepository.findOne(id, {
+      relations: ['reviews', 'ratings'],
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} alcohol`;
+  async update(
+    id: string,
+    updateAlcoholDto: UpdateAlcoholDto,
+    file: Express.Multer.File,
+  ) {
+    await this.alcoholRepository.update(id, {
+      ...updateAlcoholDto,
+      isConfirmed: true,
+      thumbnail: file?.filename,
+    });
+    return true;
+  }
+
+  async remove(id: string) {
+    await this.alcoholRepository.delete(id);
+    return true;
   }
 }

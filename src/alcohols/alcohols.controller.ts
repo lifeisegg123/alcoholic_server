@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Query,
+  UseInterceptors,
+  UploadedFile,
+  Patch,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { AlcoholsService } from './alcohols.service';
 import { CreateAlcoholDto } from './dto/create-alcohol.dto';
 import { UpdateAlcoholDto } from './dto/update-alcohol.dto';
@@ -8,27 +20,53 @@ export class AlcoholsController {
   constructor(private readonly alcoholsService: AlcoholsService) {}
 
   @Post()
-  create(@Body() createAlcoholDto: CreateAlcoholDto) {
-    return this.alcoholsService.create(createAlcoholDto);
+  @UseInterceptors(FileInterceptor('thumbnail'))
+  create(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() createAlcoholDto: CreateAlcoholDto,
+  ) {
+    return this.alcoholsService.create(createAlcoholDto, file);
   }
 
   @Get()
-  findAll() {
-    return this.alcoholsService.findAll();
+  getByCategory(
+    @Query('limit') limit: number,
+    @Query('offset') offset: number,
+    @Query('category') category?: number,
+    @Query('sortBy') sortBy?: string,
+    @Query('searchKey') searchKey?: string,
+  ) {
+    return this.alcoholsService.findByCategory({
+      category,
+      limit,
+      offset,
+      sortBy,
+      searchKey,
+    });
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.alcoholsService.findOne(+id);
+    return this.alcoholsService.findOne(id);
   }
 
-  @Put(':id')
-  update(@Param('id') id: string, @Body() updateAlcoholDto: UpdateAlcoholDto) {
-    return this.alcoholsService.update(+id, updateAlcoholDto);
+  @Get('admin')
+  findNotConfirmed() {
+    return this.alcoholsService.getNotConfirmed();
+  }
+
+  @Patch(':id')
+  @UseInterceptors(FileInterceptor('thumbnail'))
+  update(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('id') id: string,
+    @Body() updateAlcoholDto: UpdateAlcoholDto,
+  ) {
+    return this.alcoholsService.update(id, updateAlcoholDto, file);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.alcoholsService.remove(+id);
+    return this.alcoholsService.remove(id);
   }
 }
