@@ -16,7 +16,7 @@ export class User {
   @Column()
   nickname: string;
 
-  @Column()
+  @Column('bool', { default: false })
   isAdmin: boolean;
 
   @OneToMany(() => Rating, (rating) => rating.user)
