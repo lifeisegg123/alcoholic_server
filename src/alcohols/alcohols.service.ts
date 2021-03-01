@@ -53,9 +53,21 @@ export class AlcoholsService {
   }
 
   async findOne(id: string) {
-    return await this.alcoholRepository.findOne(id, {
-      relations: ['reviews', 'reviews.user', 'ratings'],
-    });
+    /* const res = await this.alcoholRepository.findOne(id, {
+      relations: ['reviews', 'reviews.user', 'ratings', 'ratings.user'],
+    }); */
+    const res = await this.alcoholRepository
+      .createQueryBuilder('alcohol')
+      .leftJoinAndSelect('alcohol.reviews', 'reviews')
+      .leftJoin('reviews.user', 'user')
+      .addSelect('user.id')
+      .addSelect('user.nickname')
+      .leftJoinAndSelect('alcohol.ratings', 'ratings')
+      .leftJoin('ratings.user', 'ratinguser')
+      .addSelect('ratinguser.id')
+      .getOne();
+
+    return res;
   }
 
   async update(

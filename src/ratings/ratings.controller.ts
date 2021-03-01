@@ -1,34 +1,29 @@
-import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Put,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { RatingsService } from './ratings.service';
 import { CreateRatingDto } from './dto/create-rating.dto';
 import { UpdateRatingDto } from './dto/update-rating.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('ratings')
 export class RatingsController {
   constructor(private readonly ratingsService: RatingsService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createRatingDto: CreateRatingDto) {
-    return this.ratingsService.create(createRatingDto);
+  create(@Request() req, @Body() createRatingDto: CreateRatingDto) {
+    return this.ratingsService.create(req.user.userId, createRatingDto);
   }
 
-  @Get()
-  findAll() {
-    return this.ratingsService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ratingsService.findOne(+id);
-  }
-
-  @Put(':id')
-  update(@Param('id') id: string, @Body() updateRatingDto: UpdateRatingDto) {
-    return this.ratingsService.update(+id, updateRatingDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ratingsService.remove(+id);
+  @UseGuards(JwtAuthGuard)
+  @Put()
+  update(@Request() req, @Body() updateRatingDto: UpdateRatingDto) {
+    return this.ratingsService.update(req.user.userId, updateRatingDto);
   }
 }
