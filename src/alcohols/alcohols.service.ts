@@ -54,7 +54,7 @@ export class AlcoholsService {
 
   async findOne(id: string) {
     return await this.alcoholRepository.findOne(id, {
-      relations: ['reviews', 'ratings'],
+      relations: ['reviews', 'reviews.user', 'ratings'],
     });
   }
 

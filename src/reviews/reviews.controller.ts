@@ -3,10 +3,11 @@ import {
   Get,
   Post,
   Body,
-  Put,
   Param,
   Delete,
   UseGuards,
+  Patch,
+  Request,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -19,24 +20,24 @@ export class ReviewsController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createReviewDto: CreateReviewDto) {
-    return this.reviewsService.create(createReviewDto);
+  create(@Body() createReviewDto: CreateReviewDto, @Request() req) {
+    return this.reviewsService.create(createReviewDto, req.user.userId);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.reviewsService.findOne(+id);
+  getByUserId(@Param('id') id: string) {
+    return this.reviewsService.getByUserId(id);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Put(':id')
+  @Patch(':id')
   update(@Param('id') id: string, @Body() updateReviewDto: UpdateReviewDto) {
-    return this.reviewsService.update(+id, updateReviewDto);
+    return this.reviewsService.update(id, updateReviewDto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.reviewsService.remove(+id);
+    return this.reviewsService.remove(id);
   }
 }

@@ -5,8 +5,5 @@ export class CreateReviewDto {
   desc: string;
 
   @IsString()
-  userId: string;
-
-  @IsString()
   alcoholId: string;
 }
