@@ -11,6 +11,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
+
   async signup(createUserDto: CreateUserDto) {
     const user = await this.findByEmail(createUserDto.email);
     if (user) {
@@ -25,20 +26,29 @@ export class UsersService {
     return true;
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async getUser(id: string) {
+    const user = await this.userRepository.findOne(id, {
+      select: ['nickname', 'id'],
+    });
+    return user;
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string) {
+    return await this.userRepository.findOne(id, {
+      select: ['nickname', 'id'],
+    });
   }
 
   async findByEmail(email: string) {
     return this.userRepository.findOne({ where: { email } });
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    const res = await this.userRepository.update(id, updateUserDto);
+    if (res) {
+      return true;
+    }
+    return false;
   }
 
   remove(id: string) {
