@@ -45,14 +45,19 @@ export class AlcoholsController {
     });
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.alcoholsService.findOne(id);
+  @Get('random')
+  getRandomOne() {
+    return this.alcoholsService.getRandomOne();
   }
 
   @Get('admin')
   findNotConfirmed() {
     return this.alcoholsService.getNotConfirmed();
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.alcoholsService.findOne(id);
   }
 
   @Patch(':id')

@@ -28,7 +28,7 @@ export class UsersService {
 
   async getUser(id: string) {
     const user = await this.userRepository.findOne(id, {
-      select: ['nickname', 'id'],
+      select: ['nickname', 'id', 'isAdmin'],
     });
     return user;
   }

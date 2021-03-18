@@ -1,9 +1,6 @@
-FROM node:alpine
-
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
+FROM node:14
 COPY . .
+RUN npm i && npm run build
 
 EXPOSE 5050
-CMD npm run start:prod
+CMD ["npm", "run", "start"]

@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Rating } from 'src/ratings/entities/rating.entity';
+import { Review } from 'src/reviews/entities/review.entity';
 import { getCategoryOp } from 'src/utils/getCategoryOp';
 import { Like, Repository } from 'typeorm';
 import { CreateAlcoholDto } from './dto/create-alcohol.dto';
@@ -10,18 +12,20 @@ import { Alcohol } from './entities/alcohol.entity';
 export class AlcoholsService {
   constructor(
     @InjectRepository(Alcohol) private alcoholRepository: Repository<Alcohol>,
+    @InjectRepository(Rating) private ratingRepository: Repository<Rating>,
+    @InjectRepository(Review) private reviewRepository: Repository<Review>,
   ) {}
 
   async create(createAlcoholDto: CreateAlcoholDto, file: Express.Multer.File) {
     await this.alcoholRepository.save({
       ...createAlcoholDto,
-      thumbnail: file.filename,
+      thumbnail: file.path,
     });
     return true;
   }
 
   async findByCategory({ category, limit, offset, sortBy, searchKey }) {
-    const where: any = {};
+    const where: any = { isConfirmed: true };
     const order: any = {};
 
     if (!isNaN(category) && category !== 0) {
@@ -48,6 +52,23 @@ export class AlcoholsService {
     };
   }
 
+  async getRandomOne() {
+    const res = await this.alcoholRepository
+      .createQueryBuilder('alcohol')
+      .where('alcohol.isConfirmed = true')
+      .orderBy('Rand()')
+      .leftJoinAndSelect('alcohol.reviews', 'reviews')
+      .leftJoin('reviews.user', 'reviwer')
+      .addSelect('reviwer.id')
+      .addSelect('reviwer.nickname')
+      .leftJoinAndSelect('alcohol.ratings', 'ratings')
+      .leftJoin('ratings.user', 'ratinguser')
+      .addSelect('ratinguser.id')
+      .getOne();
+    console.log(res);
+    return res;
+  }
+
   async getNotConfirmed() {
     return await this.alcoholRepository.find({ where: { isConfirmed: false } });
   }
@@ -58,15 +79,15 @@ export class AlcoholsService {
     }); */
     const res = await this.alcoholRepository
       .createQueryBuilder('alcohol')
+      .where('alcohol.id = :id', { id })
       .leftJoinAndSelect('alcohol.reviews', 'reviews')
-      .leftJoin('reviews.user', 'user')
-      .addSelect('user.id')
-      .addSelect('user.nickname')
+      .leftJoin('reviews.user', 'reviwer')
+      .addSelect('reviwer.id')
+      .addSelect('reviwer.nickname')
       .leftJoinAndSelect('alcohol.ratings', 'ratings')
       .leftJoin('ratings.user', 'ratinguser')
       .addSelect('ratinguser.id')
       .getOne();
-
     return res;
   }
 
@@ -75,16 +96,31 @@ export class AlcoholsService {
     updateAlcoholDto: UpdateAlcoholDto,
     file: Express.Multer.File,
   ) {
-    await this.alcoholRepository.update(id, {
-      ...updateAlcoholDto,
-      isConfirmed: true,
-      thumbnail: file?.filename,
-    });
+    const updateData = { ...updateAlcoholDto, isConfirmed: true };
+    if (file) {
+      updateData['thumbnail'] = file.path;
+    }
+    await this.alcoholRepository.update(id, updateData);
     return true;
   }
 
   async remove(id: string) {
-    await this.alcoholRepository.delete(id);
+    console.log(id);
+    await this.ratingRepository
+      .createQueryBuilder('rating')
+      .delete()
+      .where('rating.alcoholId = :id', { id })
+      .execute();
+    await this.reviewRepository
+      .createQueryBuilder('review')
+      .delete()
+      .where('review.alcoholId = :id', { id })
+      .execute();
+    await this.alcoholRepository
+      .createQueryBuilder('alcohol')
+      .delete()
+      .where('alcohol.id = :id', { id })
+      .execute();
     return true;
   }
 }

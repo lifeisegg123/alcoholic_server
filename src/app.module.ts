@@ -14,10 +14,10 @@ import { join } from 'path';
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
+      host: process.env.DB_IP || 'localhost',
       port: 3306,
-      username: 'root',
-      password: '1324dldi',
+      username: process.env.DB_USER || 'root',
+      password: process.env.DB_PASSWORD || '1324dldi',
       database: 'alcoholic',
       entities: ['dist/**/*.entity{.ts,.js}'],
       synchronize: true,
