@@ -16,7 +16,7 @@ import { Review } from 'src/reviews/entities/review.entity';
       storage: new MulterGoogleCloudStorage({
         keyFilename: join(__dirname + '../../../gcp.json'),
         bucket: 'alcoholic',
-        projectId: 'radiant-micron-305216',
+        projectId: process.env.GCP_PROJECT_ID,
       }),
       dest: './images',
     }),

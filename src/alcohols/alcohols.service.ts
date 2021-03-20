@@ -65,7 +65,6 @@ export class AlcoholsService {
       .leftJoin('ratings.user', 'ratinguser')
       .addSelect('ratinguser.id')
       .getOne();
-    console.log(res);
     return res;
   }
 
@@ -105,7 +104,6 @@ export class AlcoholsService {
   }
 
   async remove(id: string) {
-    console.log(id);
     await this.ratingRepository
       .createQueryBuilder('rating')
       .delete()

@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Request,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -27,6 +28,11 @@ export class UsersController {
   @Get()
   getUser(@Request() req) {
     return this.usersService.getUser(req.user.userId);
+  }
+
+  @Get('checkEmail')
+  checkEmail(@Query('email') email: string) {
+    return this.usersService.checkEmail(email);
   }
 
   @Get(':id')

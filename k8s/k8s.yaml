@@ -36,6 +36,24 @@ metadata:
                   .: {}
                   'f:env':
                     .: {}
+                    'k:{"name":"AUTH_CERT_URL"}':
+                      .: {}
+                      'f:name': {}
+                      'f:valueFrom':
+                        .: {}
+                        'f:configMapKeyRef':
+                          .: {}
+                          'f:key': {}
+                          'f:name': {}
+                    'k:{"name":"CLIENT_CERT_URL"}':
+                      .: {}
+                      'f:name': {}
+                      'f:valueFrom':
+                        .: {}
+                        'f:configMapKeyRef':
+                          .: {}
+                          'f:key': {}
+                          'f:name': {}
                     'k:{"name":"COOKIE_SECRET"}':
                       .: {}
                       'f:name': {}
@@ -64,6 +82,78 @@ metadata:
                           'f:key': {}
                           'f:name': {}
                     'k:{"name":"DB_USER"}':
+                      .: {}
+                      'f:name': {}
+                      'f:valueFrom':
+                        .: {}
+                        'f:configMapKeyRef':
+                          .: {}
+                          'f:key': {}
+                          'f:name': {}
+                    'k:{"name":"GCP_AUTH_URI"}':
+                      .: {}
+                      'f:name': {}
+                      'f:valueFrom':
+                        .: {}
+                        'f:configMapKeyRef':
+                          .: {}
+                          'f:key': {}
+                          'f:name': {}
+                    'k:{"name":"GCP_CLIENT_EMAIL"}':
+                      .: {}
+                      'f:name': {}
+                      'f:valueFrom':
+                        .: {}
+                        'f:configMapKeyRef':
+                          .: {}
+                          'f:key': {}
+                          'f:name': {}
+                    'k:{"name":"GCP_CLIENT_ID"}':
+                      .: {}
+                      'f:name': {}
+                      'f:valueFrom':
+                        .: {}
+                        'f:configMapKeyRef':
+                          .: {}
+                          'f:key': {}
+                          'f:name': {}
+                    'k:{"name":"GCP_PRIVATE_KEY"}':
+                      .: {}
+                      'f:name': {}
+                      'f:valueFrom':
+                        .: {}
+                        'f:configMapKeyRef':
+                          .: {}
+                          'f:key': {}
+                          'f:name': {}
+                    'k:{"name":"GCP_PRIVATE_KEY_ID"}':
+                      .: {}
+                      'f:name': {}
+                      'f:valueFrom':
+                        .: {}
+                        'f:configMapKeyRef':
+                          .: {}
+                          'f:key': {}
+                          'f:name': {}
+                    'k:{"name":"GCP_PROJECT_ID"}':
+                      .: {}
+                      'f:name': {}
+                      'f:valueFrom':
+                        .: {}
+                        'f:configMapKeyRef':
+                          .: {}
+                          'f:key': {}
+                          'f:name': {}
+                    'k:{"name":"GCP_TOKEN_URI"}':
+                      .: {}
+                      'f:name': {}
+                      'f:valueFrom':
+                        .: {}
+                        'f:configMapKeyRef':
+                          .: {}
+                          'f:key': {}
+                          'f:name': {}
+                    'k:{"name":"GCP_TYPE"}':
                       .: {}
                       'f:name': {}
                       'f:valueFrom':
@@ -103,7 +193,7 @@ metadata:
               'f:terminationGracePeriodSeconds': {}
       manager: GoogleCloudConsole
       operation: Update
-      time: '2021-03-18T14:56:16Z'
+      time: '2021-03-20T05:26:13Z'
     - apiVersion: apps/v1
       fieldsType: FieldsV1
       fieldsV1:
@@ -134,14 +224,15 @@ metadata:
           'f:observedGeneration': {}
           'f:readyReplicas': {}
           'f:replicas': {}
+          'f:unavailableReplicas': {}
           'f:updatedReplicas': {}
       manager: kube-controller-manager
       operation: Update
-      time: '2021-03-18T14:56:16Z'
+      time: '2021-03-20T05:26:13Z'
   name: server
   namespace: default
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: server
@@ -187,6 +278,56 @@ spec:
                 configMapKeyRef:
                   key: HASH_SECRET
                   name: server-config-vjur
+            - name: GCP_TYPE
+              valueFrom:
+                configMapKeyRef:
+                  key: GCP_TYPE
+                  name: server-config-vjur
+            - name: GCP_PROJECT_ID
+              valueFrom:
+                configMapKeyRef:
+                  key: GCP_PROJECT_ID
+                  name: server-config-vjur
+            - name: GCP_PRIVATE_KEY_ID
+              valueFrom:
+                configMapKeyRef:
+                  key: GCP_PRIVATE_KEY_ID
+                  name: server-config-vjur
+            - name: GCP_PRIVATE_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: GCP_PRIVATE_KEY
+                  name: server-config-vjur
+            - name: GCP_CLIENT_EMAIL
+              valueFrom:
+                configMapKeyRef:
+                  key: GCP_CLIENT_EMAIL
+                  name: server-config-vjur
+            - name: GCP_CLIENT_ID
+              valueFrom:
+                configMapKeyRef:
+                  key: GCP_CLIENT_ID
+                  name: server-config-vjur
+            - name: GCP_AUTH_URI
+              valueFrom:
+                configMapKeyRef:
+                  key: GCP_AUTH_URI
+                  name: server-config-vjur
+            - name: GCP_TOKEN_URI
+              valueFrom:
+                configMapKeyRef:
+                  key: GCP_TOKEN_URI
+                  name: server-config-vjur
+            - name: AUTH_CERT_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: AUTH_CERT_URL
+                  name: server-config-vjur
+            - name: CLIENT_CERT_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: CLIENT_CERT_URL
+                  name: server-config-vjur
           image: >-
             gcr.io/radiant-micron-305216/github.com/lifeisegg123/alcoholic_server
           imagePullPolicy: IfNotPresent
@@ -227,7 +368,7 @@ metadata:
           'f:currentReplicas': {}
       manager: vpa-recommender
       operation: Update
-      time: '2021-03-18T14:56:17Z'
+      time: '2021-03-20T04:01:45Z'
   name: server-hpa-jina
   namespace: default
 spec:
@@ -287,7 +428,7 @@ metadata:
             'f:cloud.google.com/neg-status': {}
       manager: glbc
       operation: Update
-      time: '2021-03-18T15:30:21Z'
+      time: '2021-03-18T16:07:40Z'
   name: server-jpz8g
   namespace: default
 spec:

@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -15,7 +19,7 @@ export class UsersService {
   async signup(createUserDto: CreateUserDto) {
     const user = await this.findByEmail(createUserDto.email);
     if (user) {
-      return false;
+      throw new BadRequestException('사용중인 이메일입니다.');
     }
     const password = await bcrypt.hash(createUserDto.password, 12);
     await this.userRepository.save({
@@ -43,12 +47,20 @@ export class UsersService {
     return this.userRepository.findOne({ where: { email } });
   }
 
+  async checkEmail(email: string) {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (user) {
+      return true;
+    }
+    return false;
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto) {
     const res = await this.userRepository.update(id, updateUserDto);
     if (res) {
       return true;
     }
-    return false;
+    throw new InternalServerErrorException();
   }
 
   remove(id: string) {
