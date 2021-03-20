@@ -17,6 +17,7 @@ async function bootstrap() {
     auth_provider_x509_cert_url: process.env.AUTH_CERT_URL,
     client_x509_cert_url: process.env.CLIENT_CERT_URL,
   };
+  console.log(key);
   writeFileSync(join(__dirname + '../../gcp.json'), JSON.stringify(key));
   const app = await NestFactory.create(AppModule);
   app.enableCors({
