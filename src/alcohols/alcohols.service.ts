@@ -36,7 +36,7 @@ export class AlcoholsService {
       order[key] = value;
     }
     if (searchKey) {
-      where['name'] = Like(searchKey);
+      where['name'] = Like(`%${searchKey}%`);
     }
 
     const [data, count] = await this.alcoholRepository.findAndCount({
