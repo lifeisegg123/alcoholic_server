@@ -50,6 +50,11 @@ export class AlcoholsController {
     return this.alcoholsService.getRandomOne();
   }
 
+  @Get('random-list')
+  getRandomList() {
+    return this.alcoholsService.getRandomList();
+  }
+
   @Get('admin')
   findNotConfirmed() {
     return this.alcoholsService.getNotConfirmed();
