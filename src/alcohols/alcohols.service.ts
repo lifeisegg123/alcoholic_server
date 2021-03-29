@@ -68,6 +68,16 @@ export class AlcoholsService {
     return res;
   }
 
+  async getRandomList() {
+    const res = await this.alcoholRepository
+      .createQueryBuilder('alcohol')
+      .where('alcohol.isConfirmed = true')
+      .orderBy('Rand()')
+      .limit(6)
+      .getMany();
+    return res;
+  }
+
   async getNotConfirmed() {
     return await this.alcoholRepository.find({ where: { isConfirmed: false } });
   }
