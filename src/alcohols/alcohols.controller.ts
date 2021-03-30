@@ -45,6 +45,11 @@ export class AlcoholsController {
     });
   }
 
+  @Get('all')
+  getAll() {
+    return this.alcoholsService.getAll();
+  }
+
   @Get('random')
   getRandomOne() {
     return this.alcoholsService.getRandomOne();
@@ -60,9 +65,9 @@ export class AlcoholsController {
     return this.alcoholsService.getNotConfirmed();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.alcoholsService.findOne(id);
+  @Get(':name')
+  findOne(@Param('name') name: string) {
+    return this.alcoholsService.findOne(name);
   }
 
   @Patch(':id')

@@ -15,6 +15,12 @@ export class AlcoholsService {
     @InjectRepository(Rating) private ratingRepository: Repository<Rating>,
     @InjectRepository(Review) private reviewRepository: Repository<Review>,
   ) {}
+  async getAll() {
+    const data = await this.alcoholRepository.find({
+      select: ['name'],
+    });
+    return data;
+  }
 
   async create(createAlcoholDto: CreateAlcoholDto, file: Express.Multer.File) {
     await this.alcoholRepository.save({
@@ -82,13 +88,13 @@ export class AlcoholsService {
     return await this.alcoholRepository.find({ where: { isConfirmed: false } });
   }
 
-  async findOne(id: string) {
+  async findOne(name: string) {
     /* const res = await this.alcoholRepository.findOne(id, {
       relations: ['reviews', 'reviews.user', 'ratings', 'ratings.user'],
     }); */
     const res = await this.alcoholRepository
       .createQueryBuilder('alcohol')
-      .where('alcohol.id = :id', { id })
+      .where('alcohol.name = :name', { name })
       .leftJoinAndSelect('alcohol.reviews', 'reviews')
       .leftJoin('reviews.user', 'reviwer')
       .addSelect('reviwer.id')
