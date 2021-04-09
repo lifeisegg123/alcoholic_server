@@ -33,7 +33,9 @@ export class AlcoholsService {
   async findByCategory({ category, limit, offset, sortBy, searchKey }) {
     const where: any = { isConfirmed: true };
     const order: any = {};
-
+    if (isNaN(offset)) {
+      return [];
+    }
     if (!isNaN(category) && category !== 0) {
       where['category'] = getCategoryOp(category);
     }
