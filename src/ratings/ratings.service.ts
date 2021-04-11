@@ -16,6 +16,13 @@ export class RatingsService {
   ) {}
   async create(userId: string, createRatingDto: CreateRatingDto) {
     const { alcoholId, rating } = createRatingDto;
+    const isExist = await this.ratingRepository.findOne({
+      where: { alcohol: alcoholId, user: userId },
+    });
+    if (isExist) {
+      return false;
+    }
+
     const newRating = new Rating();
     const user = await this.userRepository.findOne(userId, {
       relations: ['ratings'],
